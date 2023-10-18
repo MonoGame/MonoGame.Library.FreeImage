@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>NU5128</NoWarn>
+    <Title>MonoGame build of FreeImage Library</Title>
+    <Description>This package contains an FreeImage library built for distributing MonoGame games.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="artifacts-windows-x64\FreeImage.dll">
+      <Link>FreeImage.dll</Link>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+    </Content>
+    <Content Include="artifacts-macos\libFreeImage.dylib">
+      <Link>libFreeImage.dylib</Link>
+      <PackagePath>runtimes\osx\native</PackagePath>
+    </Content>
+    <Content Include="artifacts-linux-x64\libFreeImage.so">
+      <Link>libFreeImage.so</Link>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+    </Content>
+  </ItemGroup>
+
+</Project>
