@@ -17,7 +17,6 @@ Task("BuildWindows")
     MSBuildSettings buildSettings = new MSBuildSettings()
     {
         Verbosity = Verbosity.Normal,
-        ToolVersion = MSBuildToolVersion.VS2017,
         Configuration = "Release",
         PlatformTarget = PlatformTarget.x64
     };
