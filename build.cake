@@ -11,6 +11,17 @@ Task("BuildWindows")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
+    CleanDirectory(artifactsDir);
+
+    MSBuildSettings buildSettings = new MSBuildSettings()
+    {
+        Verbosity = Verbosity.Normal,
+        Configuration = "Release",
+        PlatformTarget = PlatformTarget.x64
+    };
+
+    MSBuild(@"freeimage\FreeImage.2017.sln", buildSettings);
+    CopyFile(@"freeimage\Dist\x64\Freeimage.dll", artifactsDir + @"\FreeImage.dll");
 
 });
 
