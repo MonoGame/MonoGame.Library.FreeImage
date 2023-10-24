@@ -11,7 +11,6 @@ Task("BuildWindows")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
-    artifactsDir = artifactsDir + "-windows-x64";
     CleanDirectory(artifactsDir);
 
     MSBuildSettings buildSettings = new MSBuildSettings()
