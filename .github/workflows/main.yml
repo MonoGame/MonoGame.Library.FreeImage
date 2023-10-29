@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-20.04]
+      fail-fast: false
     steps:
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
