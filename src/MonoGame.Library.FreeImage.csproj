@@ -9,16 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="artifacts-windows-x64\FreeImage.dll">
+    <Content Include="..\artifacts-windows-x64\FreeImage.dll">
       <Link>FreeImage.dll</Link>
       <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Include="artifacts-macos\libFreeImage.dylib">
-      <Link>libFreeImage.dylib</Link>
+    <Content Include="..\artifacts-macos\libfreeimage.dylib">
+      <Link>libfreeimage.dylib</Link>
       <PackagePath>runtimes\osx\native</PackagePath>
     </Content>
-    <Content Include="artifacts-linux-x64\libFreeImage.so">
-      <Link>libFreeImage.so</Link>
+    <Content Include="..\artifacts-linux-x64\libfreeimage.so">
+      <Link>libfreeimage.so</Link>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
     </Content>
   </ItemGroup>
