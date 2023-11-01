@@ -21,6 +21,6 @@ public sealed class PackageTask : FrostingTask<BuildContext>
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = "Release"
         };
-        context.DotNetPack("MonoGame.Library.FreeImage.csproj", dnPackSettings);
+        context.DotNetPack("src/MonoGame.Library.FreeImage.csproj", dnPackSettings);
     }
 }
