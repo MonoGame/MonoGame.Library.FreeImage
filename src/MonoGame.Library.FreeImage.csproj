@@ -5,8 +5,13 @@
     <NoWarn>NU5128</NoWarn>
     <Title>MonoGame build of FreeImage Library</Title>
     <Description>This package contains an FreeImage library built for distributing MonoGame games.</Description>
+    <PackageIcon>Icon.png</PackageIcon>
     <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\artifacts-windows-x64\FreeImage.dll">
