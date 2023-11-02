@@ -1,4 +1,7 @@
+using System.Collections;
 using System.Runtime.InteropServices;
+using Cake.Common.Diagnostics;
+using Microsoft.VisualBasic;
 
 namespace BuildScripts;
 
@@ -32,5 +35,35 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
         context.StartProcess("make", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-f Makefile.gnu", EnvironmentVariables = env });
 
         context.CopyFile(@"freeimage/Dist/libfreeimage.dylib", $"{context.ArtifactsDir}/libfreeimage.dylib");
+    }
+}
+
+[TaskName("Test macOS")]
+[IsDependentOn(typeof(BuildMacOSTask))]
+public sealed class TestMacOSTask : FrostingTask<BuildContext>
+{
+    public override bool ShouldRun(BuildContext context) => context.IsRunningOnMacOs();
+
+    public override void Run(BuildContext context)
+    {
+        context.StartProcess(
+            "dyld_info",
+            new ProcessSettings
+            {
+                Arguments = $"-dependents {context.ArtifactsDir}/libfreeimage.dylib",
+                RedirectStandardOutput = true
+            },
+            out IEnumerable<string> processOutput);
+
+        var processOutputList = processOutput.ToList();
+        for (int i = 3; i < processOutputList.Count; i++)
+        {
+            var libPath = processOutputList[i].Trim();
+            context.Information($"DEP: {libPath}");
+            if (libPath.StartsWith("/usr/lib/"))
+                continue;
+
+            throw new Exception($"Found a dynamic library ref: {libPath}");
+        }
     }
 }
