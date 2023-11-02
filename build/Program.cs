@@ -28,6 +28,7 @@ public class BuildContext : FrostingContext
 [IsDependentOn(typeof(BuildMacOSTask))]
 [IsDependentOn(typeof(BuildLinuxTask))]
 [IsDependentOn(typeof(TestMacOSTask))]
+[IsDependentOn(typeof(TestLinuxTask))]
 public class DefaultTask : FrostingTask
 {
 }
