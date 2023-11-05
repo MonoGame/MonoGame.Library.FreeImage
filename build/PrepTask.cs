@@ -26,7 +26,7 @@ public class BuildContext : FrostingContext
             Version += "." + context.EnvironmentVariable("GITHUB_RUN_NUMBER");
             RepositoryUrl = $"https://github.com/{context.EnvironmentVariable("GITHUB_REPOSITORY")}";
 
-            context.BuildSystem().GitHubActions.Commands.SetSecret(context.EnvironmentVariable("GITHUB_TOKEN"));
+            // context.BuildSystem().GitHubActions.Commands.SetSecret(context.EnvironmentVariable("GITHUB_TOKEN"));
         }
     }
 }

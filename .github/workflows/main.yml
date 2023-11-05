@@ -25,6 +25,8 @@ jobs:
           submodules: recursive
       - name: Run CAKE
         run: dotnet run --project ./build/Build.csproj
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     name: deploy
     runs-on: ubuntu-latest
@@ -40,6 +42,8 @@ jobs:
           submodules: recursive
       - name: Run CAKE
         run: dotnet run --project ./build/Build.csproj -- "--target=Package"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push packages
         run: dotnet nuget push src/bin/Release/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
