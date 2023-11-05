@@ -4,15 +4,15 @@ using Cake.Common.Build;
 namespace BuildScripts;
 
 [TaskName("Package")]
-public sealed class PackageTask : FrostingTask<BuildContext>
+public sealed class PackageTask : AsyncFrostingTask<BuildContext>
 {
-    public override void Run(BuildContext context)
+    public override async Task RunAsync(BuildContext context)
     {
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-windows-latest", "artifacts-windows-x64");
-            context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-macos-latest", "artifacts-macos");
-            context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-ubuntu-20.04", "artifacts-linux-x64");
+            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-windows-latest", "artifacts-windows-x64");
+            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-macos-latest", "artifacts-macos");
+            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-ubuntu-20.04", "artifacts-linux-x64");
         }
 
         var dnMsBuildSettings = new DotNetMSBuildSettings();
