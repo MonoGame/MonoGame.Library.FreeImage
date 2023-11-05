@@ -12,6 +12,8 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-20.04]
       fail-fast: false
     steps:
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.0.2
@@ -27,6 +29,7 @@ jobs:
         run: dotnet run --project ./build/Build.csproj
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
   deploy:
     name: deploy
     runs-on: ubuntu-latest
@@ -36,6 +39,8 @@ jobs:
     needs: [ build ]
     if: ${{ github.event_name == 'push' }}
     steps:
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - name: Clone repository
         uses: actions/checkout@v4
         with:
@@ -44,6 +49,7 @@ jobs:
         run: dotnet run --project ./build/Build.csproj -- "--target=Package"
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
       - name: Push packages
         run: dotnet nuget push src/bin/Release/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
         env:
