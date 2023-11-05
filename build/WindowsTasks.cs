@@ -1,6 +1,7 @@
 
 using System.Diagnostics;
 using Cake.Common.Tools.Command;
+using Cake.Common.Build;
 using Cake.Common.Tools.MSBuild;
 using Cake.Common.Tools.VSWhere;
 using Cake.Common.Tools.VSWhere.Latest;
@@ -30,6 +31,11 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
         context.MSBuild("freeimage/FreeImage.2017.sln", buildSettings);
         context.CopyFile("freeimage/Dist/x64/Freeimage.dll", $"{context.ArtifactsDir}/FreeImage.dll");
+
+        if (context.BuildSystem().IsRunningOnGitHubActions)
+        {
+            context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-windows-latest");
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Runtime.InteropServices;
+using Cake.Common.Build;
 using Cake.Common.Diagnostics;
 using Microsoft.VisualBasic;
 
@@ -35,6 +36,11 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
         context.StartProcess("make", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-f Makefile.gnu", EnvironmentVariables = env });
 
         context.CopyFile(@"freeimage/Dist/libfreeimage.dylib", $"{context.ArtifactsDir}/libfreeimage.dylib");
+
+        if (context.BuildSystem().IsRunningOnGitHubActions)
+        {
+            context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-macos-latest");
+        }
     }
 }
 

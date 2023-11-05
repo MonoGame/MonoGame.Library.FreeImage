@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Cake.Common.Build;
 using Cake.Common.Diagnostics;
 
 namespace BuildScripts;
@@ -32,6 +33,11 @@ public sealed class BuildLinuxTask : FrostingTask<BuildContext>
         context.StartProcess("make", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-f Makefile.gnu", EnvironmentVariables = env });
 
         context.CopyFile(@"freeimage/Dist/libfreeimage.so", $"{context.ArtifactsDir}/libfreeimage.so");
+
+        if (context.BuildSystem().IsRunningOnGitHubActions)
+        {
+            context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-ubuntu-20.04");
+        }
     }
 }
 
