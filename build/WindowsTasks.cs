@@ -14,7 +14,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
-    public override void Run(BuildContext context)
+    public override async void Run(BuildContext context)
     {
         MSBuildSettings buildSettings = new()
         {
@@ -34,7 +34,7 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-windows-latest");
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-windows-latest");
         }
     }
 }

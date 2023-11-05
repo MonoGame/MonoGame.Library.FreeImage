@@ -10,7 +10,7 @@ public sealed class BuildLinuxTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnLinux();
 
-    public override void Run(BuildContext context)
+    public override async void Run(BuildContext context)
     {
         var cflags = "-Wno-implicit-function-declaration";
         switch (RuntimeInformation.ProcessArchitecture)
@@ -36,7 +36,7 @@ public sealed class BuildLinuxTask : FrostingTask<BuildContext>
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-ubuntu-20.04");
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-ubuntu-20.04");
         }
     }
 }
