@@ -10,6 +10,10 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
     {
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
+            Directory.CreateDirectory("artifacts-windows-x64");
+            Directory.CreateDirectory("artifacts-macos");
+            Directory.CreateDirectory("artifacts-linux-x64");
+
             await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-windows-latest", "artifacts-windows-x64");
             await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-macos-latest", "artifacts-macos");
             await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-ubuntu-20.04", "artifacts-linux-x64");
