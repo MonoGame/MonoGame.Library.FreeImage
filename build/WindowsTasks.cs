@@ -10,11 +10,11 @@ namespace BuildScripts;
 
 [TaskName("Build Windows")]
 [IsDependentOn(typeof(PrepTask))]
-public sealed class BuildWindowsTask : FrostingTask<BuildContext>
+public sealed class BuildWindowsTask : AsyncFrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
-    public override async void Run(BuildContext context)
+    public override async Task RunAsync(BuildContext context)
     {
         MSBuildSettings buildSettings = new()
         {

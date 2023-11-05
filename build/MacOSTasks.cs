@@ -8,11 +8,11 @@ namespace BuildScripts;
 
 [TaskName("Build macOS")]
 [IsDependentOn(typeof(PrepTask))]
-public sealed class BuildMacOSTask : FrostingTask<BuildContext>
+public sealed class BuildMacOSTask : AsyncFrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnMacOs();
 
-    public override async void Run(BuildContext context)
+    public override async Task RunAsync(BuildContext context)
     {
         var cflags = "-Wno-implicit-function-declaration";
         switch (RuntimeInformation.ProcessArchitecture)

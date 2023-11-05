@@ -6,11 +6,11 @@ namespace BuildScripts;
 
 [TaskName("Build Linux")]
 [IsDependentOn(typeof(PrepTask))]
-public sealed class BuildLinuxTask : FrostingTask<BuildContext>
+public sealed class BuildLinuxTask : AsyncFrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnLinux();
 
-    public override async void Run(BuildContext context)
+    public override async Task RunAsync(BuildContext context)
     {
         var cflags = "-Wno-implicit-function-declaration";
         switch (RuntimeInformation.ProcessArchitecture)
