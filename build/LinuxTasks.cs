@@ -36,7 +36,7 @@ public sealed class BuildLinuxTask : AsyncFrostingTask<BuildContext>
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-ubuntu-20.04");
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), "FreeImage-ubuntu-20.04");
         }
     }
 }

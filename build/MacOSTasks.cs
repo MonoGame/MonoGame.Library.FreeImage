@@ -39,7 +39,7 @@ public sealed class BuildMacOSTask : AsyncFrostingTask<BuildContext>
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString("artifcats"), "FreeImage-macos-latest");
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), "FreeImage-macos-latest");
         }
     }
 }
