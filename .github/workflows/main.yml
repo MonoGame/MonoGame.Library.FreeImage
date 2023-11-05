@@ -28,7 +28,7 @@ jobs:
       - name: Run CAKE
         run: dotnet run --project ./build/Build.csproj
         env:
-          ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
   deploy:
     name: deploy
@@ -48,7 +48,7 @@ jobs:
       - name: Run CAKE
         run: dotnet run --project ./build/Build.csproj -- "--target=Package"
         env:
-          ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
       - name: Push packages
         run: dotnet nuget push src/bin/Release/*.nupkg --source https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json --api-key ${GITHUB_TOKEN}
