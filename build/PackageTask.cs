@@ -74,7 +74,7 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
         // Upload Artifacts
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            foreach (var nugetPath in context.GetFiles("bin/Release/*.nuget"))
+            foreach (var nugetPath in context.GetFiles("bin/Release/*.nupkg"))
             {
                 await context.BuildSystem().GitHubActions.Commands.UploadArtifact(nugetPath, nugetPath.GetFilename().ToString());
                 context.DotNetNuGetPush(nugetPath, new()
