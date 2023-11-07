@@ -53,7 +53,7 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
         projectData = projectData.Replace("{LicencePath}", @"..\freeimage\license-fi.txt");
         projectData = projectData.Replace("{LicenceName}", "LICENSE.txt");
 
-        var librariesToInclude = from rid in requiredRids from filePath in Directory.GetFiles($"runtimes/{rid}/native") select $"<Content Include=\"${filePath}\" />";
+        var librariesToInclude = from rid in requiredRids from filePath in Directory.GetFiles($"runtimes/{rid}/native") select $"<Content Include=\"{filePath}\" />";
         projectData = projectData.Replace("{LibrariesToInclude}", string.Join(Environment.NewLine, librariesToInclude));
 
         await File.WriteAllTextAsync("MonoGame.Library.FreeImage.csproj", projectData);
