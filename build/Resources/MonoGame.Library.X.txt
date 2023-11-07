@@ -8,6 +8,7 @@
     <PackageIcon>Icon.png</PackageIcon>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageLicenseFile>{LicenceName}</PackageLicenseFile>
+    <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
   <ItemGroup>
