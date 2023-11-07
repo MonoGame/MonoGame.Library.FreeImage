@@ -1,3 +1,6 @@
 [submodule "freeimage"]
 	path = freeimage
 	url = https://github.com/MonoGame/MonoGame.Mirror.FreeImage.git
+[submodule "buildscripts"]
+	path = buildscripts
+	url = https://github.com/MonoGame/MonoGame.Library.BuildScripts.git

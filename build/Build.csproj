@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Library.BuildScripts\MonoGame.Librar.BuildScripts.csproj" />
+    <ProjectReference Include="..\buildscripts\MonoGame.Library.BuildScripts.csproj" />
   </ItemGroup>
 
 </Project>
