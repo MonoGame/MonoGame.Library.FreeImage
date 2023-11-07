@@ -47,7 +47,7 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
             }
         }
 
-        // Generate project
+        // Generate Project
         var projectData = await ReadEmbeddedResourceAsync("MonoGame.Library.X.txt");
         projectData = projectData.Replace("{X}", "FreeImage");
         projectData = projectData.Replace("{LicencePath}", @"freeimage\license-fi.txt");
@@ -70,5 +70,19 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = "Release"
         });
+
+        // Upload Artifacts
+        if (context.BuildSystem().IsRunningOnGitHubActions)
+        {
+            foreach (var nugetPath in context.GetFiles("bin/Release/*.nuget"))
+            {
+                await context.BuildSystem().GitHubActions.Commands.UploadArtifact(nugetPath, nugetPath.GetFilename().ToString());
+                context.DotNetNuGetPush(nugetPath, new()
+                {
+                    ApiKey = context.EnvironmentVariable("GITHUB_TOKEN"),
+                    Source = $"https://nuget.pkg.github.com/{context.RepositoryOwner}/index.json"
+                });
+            }
+        }
     }
 }
