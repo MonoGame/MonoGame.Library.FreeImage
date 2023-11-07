@@ -9,14 +9,3 @@ public static class Program
             .UseContext<BuildContext>()
             .Run(args);
 }
-
-[TaskName("Default")]
-[IsDependentOn(typeof(BuildWindowsTask))]
-[IsDependentOn(typeof(BuildMacOSTask))]
-[IsDependentOn(typeof(BuildLinuxTask))]
-[IsDependentOn(typeof(TestMacOSTask))]
-[IsDependentOn(typeof(TestLinuxTask))]
-[IsDependentOn(typeof(TestWindowsTask))]
-public class DefaultTask : FrostingTask
-{
-}

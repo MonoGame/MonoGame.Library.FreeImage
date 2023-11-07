@@ -1,14 +1,12 @@
 
-using Cake.Common.Build;
-
 namespace BuildScripts;
 
 [TaskName("Package")]
-public sealed class PackageTask : AsyncFrostingTask<BuildContext>
+public sealed class PublishPackageTask : AsyncFrostingTask<BuildContext>
 {
     private static async Task<string> ReadEmbeddedResourceAsync(string resourceName)
     {
-        await using var stream = typeof(PackageTask).Assembly.GetManifestResourceStream(resourceName)!;
+        await using var stream = typeof(PublishPackageTask).Assembly.GetManifestResourceStream(resourceName)!;
         using var reader = new StreamReader(stream);
         return await reader.ReadToEndAsync();
     }
@@ -18,7 +16,7 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
         if (File.Exists(outPath))
             File.Delete(outPath);
 
-        await using var stream = typeof(PackageTask).Assembly.GetManifestResourceStream(resourceName)!;
+        await using var stream = typeof(PublishPackageTask).Assembly.GetManifestResourceStream(resourceName)!;
         await using var writer = File.Create(outPath);
         await stream.CopyToAsync(writer);
         writer.Close();
@@ -49,23 +47,29 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
 
         // Generate Project
         var projectData = await ReadEmbeddedResourceAsync("MonoGame.Library.X.txt");
-        projectData = projectData.Replace("{X}", "FreeImage");
-        projectData = projectData.Replace("{LicencePath}", @"freeimage\license-fi.txt");
-        projectData = projectData.Replace("{LicenceName}", "LICENSE.txt");
+        projectData = projectData.Replace("{X}", context.PackContext.LibraryName);
+        projectData = projectData.Replace("{LicencePath}", context.PackContext.LicensePath);
+
+        if (context.PackContext.LicensePath.EndsWith(".txt"))
+            projectData = projectData.Replace("{LicenceName}", "LICENSE.txt");
+        else if (context.PackContext.LicensePath.EndsWith(".md"))
+            projectData = projectData.Replace("{LicenceName}", "LICENSE.md");
+        else
+            projectData = projectData.Replace("{LicenceName}", "LICENSE");
 
         var librariesToInclude = from rid in requiredRids from filePath in Directory.GetFiles($"runtimes/{rid}/native")
             select $"<Content Include=\"{filePath}\"><PackagePath>runtimes/{rid}/native</PackagePath></Content>";
         projectData = projectData.Replace("{LibrariesToInclude}", string.Join(Environment.NewLine, librariesToInclude));
 
-        await File.WriteAllTextAsync("MonoGame.Library.FreeImage.csproj", projectData);
+        await File.WriteAllTextAsync($"MonoGame.Library.{context.PackContext.LibraryName}.csproj", projectData);
         await SaveEmbeddedResourceAsync("Icon.png", "Icon.png");
 
         // Build
         var dnMsBuildSettings = new DotNetMSBuildSettings();
-        dnMsBuildSettings.WithProperty("Version", context.Version);
-        dnMsBuildSettings.WithProperty("RepositoryUrl", context.RepositoryUrl);
+        dnMsBuildSettings.WithProperty("Version", context.PackContext.Version);
+        dnMsBuildSettings.WithProperty("RepositoryUrl", context.PackContext.RepositoryUrl);
         
-        context.DotNetPack("MonoGame.Library.FreeImage.csproj", new DotNetPackSettings
+        context.DotNetPack($"MonoGame.Library.{context.PackContext.LibraryName}.csproj", new DotNetPackSettings
         {
             MSBuildSettings = dnMsBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
@@ -81,7 +85,7 @@ public sealed class PackageTask : AsyncFrostingTask<BuildContext>
                 context.DotNetNuGetPush(nugetPath, new()
                 {
                     ApiKey = context.EnvironmentVariable("GITHUB_TOKEN"),
-                    Source = $"https://nuget.pkg.github.com/{context.RepositoryOwner}/index.json"
+                    Source = $"https://nuget.pkg.github.com/{context.PackContext.RepositoryOwner}/index.json"
                 });
             }
         }
