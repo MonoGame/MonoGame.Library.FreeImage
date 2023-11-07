@@ -51,7 +51,6 @@ jobs:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: 3.18.0
       - name: Make a release
         uses: ncipollo/release-action@v1
         with:

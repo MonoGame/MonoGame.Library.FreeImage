@@ -82,11 +82,15 @@ public sealed class PublishPackageTask : AsyncFrostingTask<BuildContext>
             foreach (var nugetPath in context.GetFiles("bin/Release/*.nupkg"))
             {
                 await context.BuildSystem().GitHubActions.Commands.UploadArtifact(nugetPath, nugetPath.GetFilename().ToString());
-                context.DotNetNuGetPush(nugetPath, new()
+                
+                if (context.PackContext.IsTag)
                 {
-                    ApiKey = context.EnvironmentVariable("GITHUB_TOKEN"),
-                    Source = $"https://nuget.pkg.github.com/{context.PackContext.RepositoryOwner}/index.json"
-                });
+                    context.DotNetNuGetPush(nugetPath, new()
+                    {
+                        ApiKey = context.EnvironmentVariable("GITHUB_TOKEN"),
+                        Source = $"https://nuget.pkg.github.com/{context.PackContext.RepositoryOwner}/index.json"
+                    });
+                }
             }
         }
     }
