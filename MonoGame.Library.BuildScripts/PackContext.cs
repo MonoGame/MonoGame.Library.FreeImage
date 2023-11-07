@@ -26,8 +26,12 @@ public class PackContext
         {
             RepositoryOwner = context.EnvironmentVariable("GITHUB_REPOSITORY_OWNER");
             RepositoryUrl = $"https://github.com/{context.EnvironmentVariable("GITHUB_REPOSITORY")}";
-            Version = context.EnvironmentVariable("GITHUB_REF_NAME");
             IsTag = context.EnvironmentVariable("GITHUB_REF_TYPE") == "tag";
+
+            if (IsTag)
+            {
+                Version = context.EnvironmentVariable("GITHUB_REF_NAME");
+            }
         }
     }
 }
