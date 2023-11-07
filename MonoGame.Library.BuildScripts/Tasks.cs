@@ -2,9 +2,6 @@
 namespace BuildScripts;
 
 [TaskName("BuildLibrary")]
-[IsDependentOn(typeof(BuildWindowsTask))]
-[IsDependentOn(typeof(BuildMacOSTask))]
-[IsDependentOn(typeof(BuildLinuxTask))]
 public class BuildLibraryTask : FrostingTask { }
 
 [TaskName("TestLibrary")]
