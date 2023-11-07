@@ -34,7 +34,7 @@ public sealed class BuildWindowsTask : AsyncFrostingTask<BuildContext>
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), "FreeImage-windows-latest");
+            await context.BuildSystem().GitHubActions.Commands.UploadArtifact(DirectoryPath.FromString(context.ArtifactsDir), "artifacts-windows-x64");
         }
     }
 }

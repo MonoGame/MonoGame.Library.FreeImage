@@ -6,24 +6,65 @@ namespace BuildScripts;
 [TaskName("Package")]
 public sealed class PackageTask : AsyncFrostingTask<BuildContext>
 {
+    private static async Task<string> ReadEmbeddedResourceAsync(string resourceName)
+    {
+        await using var stream = typeof(PackageTask).Assembly.GetManifestResourceStream(resourceName)!;
+        using var reader = new StreamReader(stream);
+        return await reader.ReadToEndAsync();
+    }
+
+    private static async Task SaveEmbeddedResourceAsync(string resourceName, string outPath)
+    {
+        if (File.Exists(outPath))
+            File.Delete(outPath);
+
+        await using var stream = typeof(PackageTask).Assembly.GetManifestResourceStream(resourceName)!;
+        await using var writer = File.Create(outPath);
+        await stream.CopyToAsync(writer);
+        writer.Close();
+    }
+
     public override async Task RunAsync(BuildContext context)
     {
+        var requiredRids = new[] {
+            "windows-x64",
+            "osx-x64",
+            "osx-arm64",
+            "linux-x64"
+        };
+
+        // Download built artifacts
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
-            Directory.CreateDirectory("artifacts-windows-x64");
-            Directory.CreateDirectory("artifacts-macos");
-            Directory.CreateDirectory("artifacts-linux-x64");
+            foreach (var rid in requiredRids)
+            {
+                var directoryPath = $"runtimes/{rid}/native";
+                if (context.DirectoryExists(directoryPath))
+                    continue;
 
-            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-windows-latest", "artifacts-windows-x64");
-            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-macos-latest", "artifacts-macos");
-            await context.BuildSystem().GitHubActions.Commands.DownloadArtifact("FreeImage-ubuntu-20.04", "artifacts-linux-x64");
+                context.CreateDirectory(directoryPath);
+                await context.BuildSystem().GitHubActions.Commands.DownloadArtifact($"artifacts-{rid}", directoryPath);
+            }
         }
 
+        // Generate project
+        var projectData = await ReadEmbeddedResourceAsync("MonoGame.Library.X.txt");
+        projectData = projectData.Replace("{X}", "FreeImage");
+        projectData = projectData.Replace("{LicencePath}", @"..\freeimage\license-fi.txt");
+        projectData = projectData.Replace("{LicenceName}", "LICENSE.txt");
+
+        var librariesToInclude = from rid in requiredRids from filePath in Directory.GetFiles($"runtimes/{rid}/native") select $"<Content Include=\"${filePath}\" />";
+        projectData = projectData.Replace("{LibrariesToInclude}", string.Join(Environment.NewLine, librariesToInclude));
+
+        await File.WriteAllTextAsync("MonoGame.Library.FreeImage.csproj", projectData);
+        await SaveEmbeddedResourceAsync("Icon.png", "Icon.png");
+
+        // Build
         var dnMsBuildSettings = new DotNetMSBuildSettings();
         dnMsBuildSettings.WithProperty("Version", context.Version);
         dnMsBuildSettings.WithProperty("RepositoryUrl", context.RepositoryUrl);
         
-        context.DotNetPack("src/MonoGame.Library.FreeImage.csproj", new DotNetPackSettings
+        context.DotNetPack("MonoGame.Library.FreeImage.csproj", new DotNetPackSettings
         {
             MSBuildSettings = dnMsBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
