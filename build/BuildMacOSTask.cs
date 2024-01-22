@@ -45,15 +45,15 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
             makeFilePattern,
             "SHAREDLIB = lib$(TARGET)-$(VER_MAJOR).$(VER_MINOR).dylib",
             "SHAREDLIB = lib$(TARGET).dylib");
-        context.ReplaceTextInFiles(
-            makeFilePattern, 
-            "cp *.so Dist/", 
-            "cp *.dylib Dist/");
         // build only dynamic library
         context.ReplaceTextInFiles(
             makeFilePattern,
             "FreeImage: $(STATICLIB)",
             "FreeImage: $(SHAREDLIB)");
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "cp *.a Dist/",
+            "cp *.dylib Dist/");
 
         // generate x86_64 and arm64 at once
         if (context.IsUniversalBinary)
