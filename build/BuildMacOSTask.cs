@@ -52,8 +52,8 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
             "FreeImage: $(SHAREDLIB)");
         context.ReplaceTextInFiles(
             makeFilePattern,
-            "cp *.a Dist/",
-            "cp *.dylib Dist/");
+            "cp *.a Dist",
+            "cp *.dylib Dist");
 
         // generate x86_64 and arm64 at once
         if (context.IsUniversalBinary)
