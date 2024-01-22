@@ -60,27 +60,12 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
         {
             context.ReplaceTextInFiles(
                 makeFilePattern, 
-                "COMPILERFLAGS_X86_64 = -arch x86_64",
-                "COMPILERFLAGS_X86_64 = -arch x86_64 -arch arm64");
-            
-            // remove arch specification to leave it to compiler flags
-            context.ReplaceTextInFiles(
-                makeFilePattern, 
-                "$(LIBTOOL) -arch_only x86_64 -o $@ $(MODULES_X86_64)",
-                "$(LIBTOOL) -o $@ $(MODULES_X86_64)");
+                "I386",
+                "ARM64");
             context.ReplaceTextInFiles(
                 makeFilePattern,
-                "$(CPP_X86_64) -arch x86_64 -dynamiclib $(LIBRARIES_X86_64) -o $@ $(MODULES_X86_64)",
-                "$(CPP_X86_64) -dynamiclib $(LIBRARIES_X86_64) -o $@ $(MODULES_X86_64)");
-            // remove Intel 32bit
-            context.ReplaceTextInFiles(
-                makeFilePattern,
-                "$(SHAREDLIB): $(SHAREDLIB)-i386 $(SHAREDLIB)-x86_64",
-                "$(SHAREDLIB): $(SHAREDLIB)-x86_64");
-            context.ReplaceTextInFiles(
-                makeFilePattern,
-                "$(LIPO) -create $(SHAREDLIB)-i386 $(SHAREDLIB)-x86_64 -output $(SHAREDLIB)",
-                "$(LIPO) -create $(SHAREDLIB)-x86_64 -output $(SHAREDLIB)");
+                "i386",
+                "arm64");
         }
 
         var buildWorkingDir = "freeimage/";
