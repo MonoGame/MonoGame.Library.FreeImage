@@ -11,26 +11,65 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        var cflags = "-Wno-implicit-function-declaration";
-        switch (RuntimeInformation.ProcessArchitecture)
+        // we need to patch the source to be compatible with the xcode 64bit compiler
+
+        // ZLib
+        context.ReplaceTextInFiles(
+            "freeimage/Source/ZLib/gzlib.c",
+            "/* Local functions */",
+            "#ifdef __APPLE__\r\n    #define _LARGEFILE64_SOURCE     /* See feature_test_macros(7) */\r\n    #include <sys/types.h>\r\n    #include <unistd.h>\r\n#endif");
+        context.ReplaceTextInFiles(
+            "freeimage/Source/ZLib/gzguts.h",
+            "#ifdef _LARGEFILE64_SOURCE",
+            "#ifdef __APPLE__\r\n    #include <unistd.h>\r\n#endif\r\n\r\n#ifdef _LARGEFILE64_SOURCE");
+        // LibJXR
+        context.ReplaceTextInFiles(
+            "freeimage/Source/LibJXR/image/decode/segdec.c",
+            "#include \"strcodec.h\"",
+            "#ifdef __APPLE__\r\n    #include <libkern/OSByteOrder.h>\r\n    #define _byteswap_ulong(x) _OSSwapInt32\r\n#endif\r\n\r\n#include \"strcodec.h\"");
+        context.ReplaceTextInFiles(
+            "freeimage/Source/LibJXR/jxrgluelib/JXRGlueJxr.c",
+            "#include <limits.h>",
+            "#ifdef __APPLE__\r\n    #include <wchar.h>\r\n#endif\r\n\r\n#include <limits.h>");
+
+        // we need to modify the makefile to produce a dynamic library
+
+        var makeFilePattern = "freeimage/Makefile.osx";
+        // disable neon instructions in case we're building for arm64
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "COMPILERFLAGS = -Os -fexceptions -fvisibility=hidden -DNO_LCMS -D__ANSI__",
+            "COMPILERFLAGS = -Os -fexceptions -fvisibility=hidden -DNO_LCMS -D__ANSI__ -DDISABLE_PERF_MEASUREMENT -DPNG_ARM_NEON_OPT=0");
+        // rename output to libFreeImage.dylib
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "SHAREDLIB = lib$(TARGET)-$(VER_MAJOR).$(VER_MINOR).dylib",
+            "SHAREDLIB = lib$(TARGET).dylib");
+        // build only dynamic library
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "FreeImage: $(STATICLIB)",
+            "FreeImage: $(SHAREDLIB)");
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "cp *.a Dist",
+            "cp *.dylib Dist");
+
+        // generate x86_64 and arm64 at once
+        if (context.IsUniversalBinary)
         {
-            case Architecture.Arm:
-            case Architecture.Arm64:
-                cflags += " -O3 -fPIC -fexceptions -fvisibility=hidden -DPNG_ARM_NEON_OPT=0";
-                break;
+            context.ReplaceTextInFiles(
+                makeFilePattern, 
+                "I386",
+                "ARM64");
+            context.ReplaceTextInFiles(
+                makeFilePattern,
+                "i386",
+                "arm64");
         }
 
-        var makeFilePattern = "freeimage/Makefile.*";
-        context.ReplaceRegexInFiles(makeFilePattern, @"SHAREDLIB.+\=.+", "SHAREDLIB = lib$(TARGET).dylib");
-        context.ReplaceTextInFiles(makeFilePattern, "cp *.so Dist/", "cp *.dylib Dist/");
-        context.ReplaceTextInFiles(makeFilePattern, "$(CC) -s -shared -Wl,-soname,$(VERLIBNAME) $(LDFLAGS) -o $@ $(MODULES) $(LIBRARIES)", "$(CXX) -dynamiclib -install_name $(LIBNAME) -current_version $(VER_MAJOR).$(VER_MINOR) -compatibility_version $(VER_MAJOR) $(LDFLAGS) -o $@ $(MODULES)");
-
         var buildWorkingDir = "freeimage/";
-        var env = new Dictionary<string, string>
-        {
-            { "CFLAGS", cflags }
-        };
-        context.StartProcess("make", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-f Makefile.gnu", EnvironmentVariables = env });
-        context.CopyFile(@"freeimage/Dist/libfreeimage.dylib", $"{context.ArtifactsDir}/libfreeimage.dylib");
+        context.StartProcess("make", new ProcessSettings { WorkingDirectory = buildWorkingDir, Arguments = "-f Makefile.osx"});
+        context.CopyFile(@"freeimage/Dist/libFreeImage.dylib", $"{context.ArtifactsDir}/libfreeimage.dylib");
     }
 }
