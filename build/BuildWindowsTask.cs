@@ -14,6 +14,10 @@ public sealed class BuildWindowsTask : FrostingTask<BuildContext>
         //  Disable openmp so there is no dependency on VCOMP140.dll
         context.ReplaceTextInFiles("freeimage/**/*LibRawLite.2017.vcxproj", "<OpenMPSupport>true</OpenMPSupport>", "<OpenMPSupport>false</OpenMPSupport>");
 
+        // Replace std::binary_function with our own as its been deprecated
+        context.ReplaceTextInFiles("freeimage/Source/OpenEXR/IlmImf/ImfAttribute.cpp", "std::binary_function", "binary_function");
+        context.ReplaceRegexInFiles("freeimage/Source/OpenEXR/IlmImf/ImfAttribute.cpp", "namespace {.*", "namespace { template<class Arg1, class Arg2, class Result> struct binary_function { using first_argument_type = Arg1; using second_argument_type = Arg2; using result_type = Result; };");
+
         MSBuildSettings buildSettings = new()
         {
             Verbosity = Verbosity.Normal,
