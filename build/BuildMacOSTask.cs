@@ -28,6 +28,10 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
             "#include \"strcodec.h\"",
             "#ifdef __APPLE__\r\n    #include <libkern/OSByteOrder.h>\r\n    #define _byteswap_ulong(x) _OSSwapInt32\r\n#endif\r\n\r\n#include \"strcodec.h\"");
         context.ReplaceTextInFiles(
+            "freeimage/Source/LibJXR/image/decode/segdec.c",
+            "return _byteswap_ulong(*(U32*)pv);",
+            "return (U32)_byteswap_ulong(*(U32*)pv);");
+        context.ReplaceTextInFiles(
             "freeimage/Source/LibJXR/jxrgluelib/JXRGlueJxr.c",
             "#include <limits.h>",
             "#ifdef __APPLE__\r\n    #include <wchar.h>\r\n#endif\r\n\r\n#include <limits.h>");
