@@ -55,6 +55,11 @@ public sealed class BuildMacOSTask : FrostingTask<BuildContext>
             "cp *.a Dist",
             "cp *.dylib Dist");
 
+        context.ReplaceTextInFiles(
+            makeFilePattern,
+            "MACOSX_DEPLOYMENT_TARGET = 10.11",
+            "MACOSX_DEPLOYMENT_TARGET = 10.5");
+
         // generate x86_64 and arm64 at once
         if (context.IsUniversalBinary)
         {
